@@ -2,9 +2,19 @@ import * as request from 'request';
 import * as moment from 'moment';
 import { TWITTER_MENTION_URL } from './constants';
 import axios from 'axios';
-import { map } from 'lodash';
+import * as Twitter from 'twit';
 
-export class ApiService {
+export class ApiService {   
+
+    static Twit = new Twitter({
+        consumer_key:         'ybWJ7HrPvVL4ueVaEIG0YJEVd',
+        consumer_secret:      'eVr46yZqpWAQKr1eyCnl0as8AonRHNIkteC2VctvLfqiJjr5Q2',
+        access_token:         '1363154619350745095-xIwF9hNj4BOvQ76d3vmJTl2RNbRRCz',
+        access_token_secret:  'b3SevfNGlPwfBjvTCFWiRQyFNXDl6ndNoQAcWOCIRBJ3T',
+        timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
+        strictSSL:            true,     // optional - requires SSL certificates to be valid.
+    })
+
     public static async mentionTweets() {
         return new Promise(async (resolve, reject) => {
             try {
@@ -61,6 +71,21 @@ export class ApiService {
                     }
                 });
                 resolve(sentiment.data);
+            } catch(err) {
+                reject(err);
+            }
+        })
+    }
+
+    public static async replyTweet(id, text) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let sentiment = await this.sentiment(text);
+                console.log(sentiment);
+                let tweet: any = await this.Twit.get(`statuses/show/:id`, {id: id});
+                let reply = await this.Twit.post('statuses/update', {in_reply_to_status_id: tweet.data.id_str, status: '@' + tweet.data.user.screen_name + ' Happy to see your review' });
+                console.log(reply)
+                resolve(reply);
             } catch(err) {
                 reject(err);
             }
