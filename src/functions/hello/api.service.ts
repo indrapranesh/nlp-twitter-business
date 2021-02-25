@@ -89,7 +89,7 @@ export class ApiService {
                 } else {
                     tweetMessage = 'Thank you :), have a nice day.'
                 }
-                let reply = await this.Twit.post('statuses/update', {in_reply_to_status_id: tweet.data.id_str, status: '@' + tweet.data.user.screen_name + tweetMessage });
+                let reply = await this.Twit.post('statuses/update', {in_reply_to_status_id: tweet.data.id_str, status: '@' + tweet.data.user.screen_name + ' ' + tweetMessage });
                 console.log(reply)
                 resolve(reply);
             } catch(err) {
