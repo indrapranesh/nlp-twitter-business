@@ -80,10 +80,16 @@ export class ApiService {
     public static async replyTweet(id, text) {
         return new Promise(async (resolve, reject) => {
             try {
-                let sentiment = await this.sentiment(text);
+                let sentiment: any = await this.sentiment(text);
                 console.log(sentiment);
+                let tweetMessage = 'Thanks for your feedback';
                 let tweet: any = await this.Twit.get(`statuses/show/:id`, {id: id});
-                let reply = await this.Twit.post('statuses/update', {in_reply_to_status_id: tweet.data.id_str, status: '@' + tweet.data.user.screen_name + ' Happy to see your review' });
+                if(sentiment && sentiment.data && sentiment.data.sentiment.negativity < 0) {
+                    tweetMessage = 'We extremely apologize for the inconvenience caused. We will make sure it does not happen again.'
+                } else {
+                    tweetMessage = 'Thank you :), have a nice day.'
+                }
+                let reply = await this.Twit.post('statuses/update', {in_reply_to_status_id: tweet.data.id_str, status: '@' + tweet.data.user.screen_name + tweetMessage });
                 console.log(reply)
                 resolve(reply);
             } catch(err) {
